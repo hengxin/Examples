@@ -21,12 +21,3 @@ Paxos
   strong enough to be inductive.  (Note: because when he
   began the proof TLAPS did not handle records, Tristan
   rewrote the algorithm in terms of tuples for his proof.)
-  
-MCConsensus
-MCVoting
-MCPaxos
-  Specifications that are used to model-check the corresponding
-  three specifications above.  The Toolbox makes it unnecessary
-  for the user to write such specs, essentially producing them
-  itself from the models defined by the user.
-   

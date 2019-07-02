@@ -2,3 +2,10 @@
 *.sh
 
 *.xls
+
+*.launch
+*SnapShot*
+*.aux
+*.log
+*.out
+*.swp
