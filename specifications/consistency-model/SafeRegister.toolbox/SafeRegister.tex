@@ -940,83 +940,161 @@
 \tlatex
 \setboolean{shading}{true}
  \@x{\makebox[0pt][r]{\scriptsize 1\hspace{1em}}}\moduleLeftDash\@xx{
- {\MODULE} Consensus}\moduleRightDash\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 2\hspace{1em}} {\EXTENDS} Naturals ,\,
- FiniteSets}%
-\@x{\makebox[0pt][r]{\scriptsize 3\hspace{1em}}}\midbar\@xx{}%
-\@x{\makebox[0pt][r]{\scriptsize 4\hspace{1em}} {\CONSTANT} Value\@s{4.1}}%
-\@y{\@s{0}%
- the set of all values that can be chosen
-}%
-\@xx{}%
-\@x{\makebox[0pt][r]{\scriptsize 5\hspace{1em}}}\midbar\@xx{}%
-\@x{\makebox[0pt][r]{\scriptsize 6\hspace{1em}} {\VARIABLE} chosen\@s{2.58}}%
-\@y{\@s{0}%
- the set of all values that have been chosen
-}%
-\@xx{}%
+ {\MODULE} SafeRegister}\moduleRightDash\@xx{}%
+\@x{\makebox[0pt][r]{\scriptsize 2\hspace{1em}} {\CONSTANTS}}%
+\@x{\makebox[0pt][r]{\scriptsize 3\hspace{1em}}\@s{16.4} Writer ,\,}%
+\@x{\makebox[0pt][r]{\scriptsize 4\hspace{1em}}\@s{16.4} Reader ,\,}%
+\@x{\makebox[0pt][r]{\scriptsize 5\hspace{1em}}\@s{16.4} T}%
 \@pvspace{8.0pt}%
-\@x{\makebox[0pt][r]{\scriptsize 8\hspace{1em}} TypeOK \.{\defeq}}%
- \@x{\makebox[0pt][r]{\scriptsize 9\hspace{1em}}\@s{16.4} \.{\land}\@s{9.74}
- IsFiniteSet ( chosen )}%
- \@x{\makebox[0pt][r]{\scriptsize 10\hspace{1em}}\@s{16.4} \.{\land}\@s{9.74}
- chosen \.{\subseteq} Value}%
-\@x{\makebox[0pt][r]{\scriptsize 11\hspace{1em}}}\midbar\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 12\hspace{1em}} Init\@s{4.12} \.{\defeq}
- chosen \.{=} \{ \}}%
+ \@x{\makebox[0pt][r]{\scriptsize 7\hspace{1em}} notValue \.{\defeq} {\CHOOSE}
+ t \.{:} t \.{\notin} T}%
 \@pvspace{8.0pt}%
-\@x{\makebox[0pt][r]{\scriptsize 14\hspace{1em}} Next \.{\defeq}}%
- \@x{\makebox[0pt][r]{\scriptsize 15\hspace{1em}}\@s{16.4} \.{\land} chosen
- \.{=} \{ \}}%
- \@x{\makebox[0pt][r]{\scriptsize 16\hspace{1em}}\@s{16.4} \.{\land} \E\, v
- \.{\in} Value \.{:} chosen \.{'} \.{=} \{ v \}}%
-\@x{\makebox[0pt][r]{\scriptsize 17\hspace{1em}}}\midbar\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 18\hspace{1em}} Spec \.{\defeq} Init
- \.{\land} {\Box} [ Next ]_{ chosen}}%
-\@x{\makebox[0pt][r]{\scriptsize 19\hspace{1em}}}\midbar\@xx{}%
-\@x{\makebox[0pt][r]{\scriptsize 20\hspace{1em}} Inv \.{\defeq}}%
-\@x{\makebox[0pt][r]{\scriptsize 21\hspace{1em}}\@s{15.15} \.{\land} TypeOK}%
- \@x{\makebox[0pt][r]{\scriptsize 22\hspace{1em}}\@s{15.15} \.{\land}
- Cardinality ( chosen ) \.{\leq} 1}%
-\@y{\@s{0}%
- Safety: at most one value is chosen
-}%
-\@xx{}%
+\begin{lcom}{5.0}%
+\begin{cpar}{0}{F}{F}{0}{0}{}%
+*************************************************************************
+\end{cpar}%
+\end{lcom}%
+\pcalsymbolstrue
+\pcalshadingtrue
+\csyntaxtrue
+ \@x{\makebox[0pt][r]{\scriptsize 10\hspace{1em}} {\p@mmalgorithm} Register
+ {\p@lbrace}}%
+ \@x{\makebox[0pt][r]{\scriptsize 11\hspace{1em}}\@s{16.4} {\p@variables} r
+ \.{=} notValue ,\, result \.{=} notValue {\p@semicolon}}%
 \@pvspace{8.0pt}%
- \@x{\makebox[0pt][r]{\scriptsize 24\hspace{1em}} {\THEOREM} Invariance
- \.{\defeq} Spec \.{\implies} {\Box} Inv}%
- \@x{\makebox[0pt][r]{\scriptsize 25\hspace{1em}}\@pfstepnum{1}{1.}\  Init
- \.{\implies} Inv}%
- \@x{\makebox[0pt][r]{\scriptsize 26\hspace{1em}}\@pfstepnum{1}{2.}\  Inv
- \.{\land} [ Next ]_{ chosen} \.{\implies} Inv \.{'}}%
-\@x{\makebox[0pt][r]{\scriptsize 27\hspace{1em}}\@pfstepnum{1}{3.}\  {\QED}}%
- \@x{\makebox[0pt][r]{\scriptsize 28\hspace{1em}}\@s{8.2}\@pfstepnum{2}{1.}\ 
- Inv \.{\land} {\Box} [ Next ]_{ chosen} \.{\implies} {\Box} Inv}%
- \@x{\makebox[0pt][r]{\scriptsize 29\hspace{1em}}\@s{16.4}
- {\BY}\@pfstepnum{1}{2}\ }%
-\@y{\@s{0}%
- and a TLA proof rule
-}%
-\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 30\hspace{1em}}\@s{8.2}\@pfstepnum{2}{2.}\ 
- {\QED}}%
- \@x{\makebox[0pt][r]{\scriptsize 31\hspace{1em}}\@s{16.4}
- {\BY}\@pfstepnum{1}{1} ,\,\@pfstepnum{2}{1}\ \@s{4.1}}%
-\@y{\@s{0}%
- and simple logic
-}%
-\@xx{}%
-\@x{\makebox[0pt][r]{\scriptsize 32\hspace{1em}}}\midbar\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 33\hspace{1em}} Success \.{\defeq}
- {\Diamond} ( chosen \.{\neq} \{ \} )}%
-\@y{\@s{0}%
- Liveness: a value is eventually chosen
-}%
-\@xx{}%
- \@x{\makebox[0pt][r]{\scriptsize 34\hspace{1em}} LiveSpec \.{\defeq} Spec
- \.{\land} {\WF}_{ chosen} ( Next )}%
+ \@x{\makebox[0pt][r]{\scriptsize 13\hspace{1em}}\@s{16.4} {\p@process}
+ {\p@lparen} W \.{\in} Writer {\p@rparen}}%
+\@x{\makebox[0pt][r]{\scriptsize 14\hspace{1em}}\@s{16.4} {\p@lbrace}}%
+ \@x{\makebox[0pt][r]{\scriptsize 15\hspace{1em}}\@s{32.8}
+ a\@s{.5}\textrm{:}\@s{3} r \.{:=} notValue {\p@semicolon}}%
+ \@x{\makebox[0pt][r]{\scriptsize 16\hspace{1em}}\@s{32.8}
+ b\@s{.5}\textrm{:}\@s{3}\@s{0.64} {\p@with} {\p@lparen} v \.{\in} T
+ {\p@rparen}}%
+ \@x{\makebox[0pt][r]{\scriptsize 17\hspace{1em}}\@s{71.15} {\p@lbrace} r
+ \.{:=} v {\p@rbrace}}%
+\@x{\makebox[0pt][r]{\scriptsize 18\hspace{1em}}\@s{16.4} {\p@rbrace}}%
 \@pvspace{8.0pt}%
- \@x{\makebox[0pt][r]{\scriptsize 36\hspace{1em}} {\THEOREM} LivenessTheorem
- \.{\defeq} LiveSpec \.{\implies}\@s{4.1} Success}%
-\@x{\makebox[0pt][r]{\scriptsize 37\hspace{1em}}}\bottombar\@xx{}%
+ \@x{\makebox[0pt][r]{\scriptsize 20\hspace{1em}}\@s{16.4} {\p@process}
+ {\p@lparen} R \.{\in} Reader {\p@rparen} {\p@lbrace}}%
+ \@x{\makebox[0pt][r]{\scriptsize 21\hspace{1em}}\@s{32.8}
+ c\@s{.5}\textrm{:}\@s{3} {\p@with} {\p@lparen} v \.{\in} {\IF} r \.{=}
+ notValue \.{\THEN} T \.{\ELSE} \{ r \} {\p@rparen}}%
+ \@x{\makebox[0pt][r]{\scriptsize 22\hspace{1em}}\@s{70.43} {\p@lbrace} result
+ \.{:=} v {\p@rbrace}}%
+\@x{\makebox[0pt][r]{\scriptsize 23\hspace{1em}}\@s{16.4} {\p@rbrace}}%
+\@x{\makebox[0pt][r]{\scriptsize 24\hspace{1em}} {\p@rbrace}}%
+\@y{}%
+\@xx{}%
+\pcalshadingfalse \pcalsymbolsfalse
+\begin{lcom}{5.0}%
+\begin{cpar}{0}{F}{F}{0}{0}{}%
+**************************************************************************
+\end{cpar}%
+\end{lcom}%
+\@x{\makebox[0pt][r]{\scriptsize 26\hspace{1em}}}%
+\@y{\@s{0}%
+ BEGIN TRANSLATION
+}%
+\@xx{}%
+ \@x{\makebox[0pt][r]{\scriptsize 27\hspace{1em}} {\VARIABLES} r ,\, result
+ ,\, pc}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 29\hspace{1em}} vars \.{\defeq} {\langle} r
+ ,\, result ,\, pc {\rangle}}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 31\hspace{1em}} ProcSet \.{\defeq} ( Writer
+ ) \.{\cup} ( Reader )}%
+\@pvspace{8.0pt}%
+\@x{\makebox[0pt][r]{\scriptsize 33\hspace{1em}} Init \.{\defeq}}%
+\@y{\@s{0}%
+ Global variables
+}%
+\@xx{}%
+ \@x{\makebox[0pt][r]{\scriptsize 34\hspace{1em}}\@s{35.70} \.{\land} r \.{=}
+ notValue}%
+ \@x{\makebox[0pt][r]{\scriptsize 35\hspace{1em}}\@s{35.70} \.{\land} result
+ \.{=} notValue}%
+ \@x{\makebox[0pt][r]{\scriptsize 36\hspace{1em}}\@s{35.70} \.{\land} pc \.{=}
+ [ self \.{\in} ProcSet \.{\mapsto} {\CASE} self \.{\in} Writer\@s{0.5}
+ \.{\rightarrow}\@w{a}}%
+ \@x{\makebox[0pt][r]{\scriptsize 37\hspace{1em}}\@s{160.39} {\Box}\@s{10.30}
+ self \.{\in} Reader \.{\rightarrow}\@w{c} ]}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 39\hspace{1em}} a ( self )\@s{5.94}
+ \.{\defeq} \.{\land} pc [ self ] \.{=}\@w{a}}%
+ \@x{\makebox[0pt][r]{\scriptsize 40\hspace{1em}}\@s{54.92} \.{\land} r \.{'}
+ \.{=} notValue}%
+ \@x{\makebox[0pt][r]{\scriptsize 41\hspace{1em}}\@s{54.92} \.{\land} pc \.{'}
+ \.{=} [ pc {\EXCEPT} {\bang} [ self ] \.{=}\@w{b} ]}%
+ \@x{\makebox[0pt][r]{\scriptsize 42\hspace{1em}}\@s{54.92} \.{\land}
+ {\UNCHANGED} result}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 44\hspace{1em}} b ( self )\@s{6.59}
+ \.{\defeq} \.{\land} pc [ self ] \.{=}\@w{b}}%
+ \@x{\makebox[0pt][r]{\scriptsize 45\hspace{1em}}\@s{54.92} \.{\land} \E\,
+ v\@s{3.40} \.{\in} T \.{:}}%
+\@x{\makebox[0pt][r]{\scriptsize 46\hspace{1em}}\@s{74.23} r \.{'} \.{=} v}%
+ \@x{\makebox[0pt][r]{\scriptsize 47\hspace{1em}}\@s{54.92} \.{\land} pc \.{'}
+ \.{=} [ pc {\EXCEPT} {\bang} [ self ] \.{=}\@w{Done} ]}%
+ \@x{\makebox[0pt][r]{\scriptsize 48\hspace{1em}}\@s{54.92} \.{\land}
+ {\UNCHANGED} result}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 50\hspace{1em}} W ( self ) \.{\defeq} a (
+ self ) \.{\lor} b ( self )}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 52\hspace{1em}} c ( self )\@s{6.65}
+ \.{\defeq} \.{\land} pc [ self ] \.{=}\@w{c}}%
+ \@x{\makebox[0pt][r]{\scriptsize 53\hspace{1em}}\@s{54.92} \.{\land} \E\, v
+ \.{\in} {\IF} r \.{=} notValue \.{\THEN} T \.{\ELSE} \{ r \} \.{:}}%
+ \@x{\makebox[0pt][r]{\scriptsize 54\hspace{1em}}\@s{74.23} result \.{'} \.{=}
+ v}%
+ \@x{\makebox[0pt][r]{\scriptsize 55\hspace{1em}}\@s{54.92} \.{\land} pc \.{'}
+ \.{=} [ pc {\EXCEPT} {\bang} [ self ] \.{=}\@w{Done} ]}%
+ \@x{\makebox[0pt][r]{\scriptsize 56\hspace{1em}}\@s{54.92} \.{\land} r \.{'}
+ \.{=} r}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 58\hspace{1em}} R ( self )\@s{4.14}
+ \.{\defeq} c ( self )}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 60\hspace{1em}} Next \.{\defeq} ( \E\, self
+ \.{\in} Writer \.{:} W ( self ) )}%
+ \@x{\makebox[0pt][r]{\scriptsize 61\hspace{1em}}\@s{47.82} \.{\lor} ( \E\,
+ self \.{\in} Reader \.{:} R ( self ) )}%
+\@x{\makebox[0pt][r]{\scriptsize 62\hspace{1em}}\@s{47.82} \.{\lor}}%
+\@y{\@s{0}%
+ Disjunct to prevent deadlock on termination
+}%
+\@xx{}%
+ \@x{\makebox[0pt][r]{\scriptsize 63\hspace{1em}}\@s{58.93} ( ( \A\, self
+ \.{\in} ProcSet \.{:} pc [ self ] \.{=}\@w{Done} ) \.{\land} {\UNCHANGED}
+ vars )}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 65\hspace{1em}} Spec\@s{1.46} \.{\defeq}
+ Init \.{\land} {\Box} [ Next ]_{ vars}}%
+\@pvspace{8.0pt}%
+ \@x{\makebox[0pt][r]{\scriptsize 67\hspace{1em}} Termination \.{\defeq}
+ {\Diamond} ( \A\, self \.{\in} ProcSet \.{:} pc [ self ] \.{=}\@w{Done} )}%
+\@pvspace{8.0pt}%
+\@x{\makebox[0pt][r]{\scriptsize 69\hspace{1em}}}%
+\@y{\@s{0}%
+ END TRANSLATION
+}%
+\@xx{}%
+\@x{\makebox[0pt][r]{\scriptsize 70\hspace{1em}}}\bottombar\@xx{}%
+\setboolean{shading}{false}
+\begin{lcom}{0}%
+\begin{cpar}{0}{F}{F}{0}{0}{}%
+\ensuremath{\.{\,\backslash\,}}* Modification History
+\end{cpar}%
+\begin{cpar}{0}{F}{F}{0}{0}{}%
+ \ensuremath{\.{\,\backslash\,}}* Last modified Sat \ensuremath{Jul} 06
+ 09:21:10 \ensuremath{CST} 2019 by \ensuremath{hengxin
+}%
+\end{cpar}%
+\begin{cpar}{0}{F}{F}{0}{0}{}%
+ \ensuremath{\.{\,\backslash\,}}* Created \ensuremath{Wed} \ensuremath{Jul} 03
+ 11:03:58 \ensuremath{CST} 2019 by \ensuremath{hengxin
+}%
+\end{cpar}%
+\end{lcom}%
 \end{document}

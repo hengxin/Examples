@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>MCConsensus</name>
+	<name>SafeRegister</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -16,9 +16,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Consensus.tla</name>
+			<name>SafeRegister.tla</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Consensus.tla</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/SafeRegister.tla</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

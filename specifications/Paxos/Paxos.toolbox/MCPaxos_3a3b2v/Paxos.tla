@@ -122,6 +122,7 @@ Phase2a(b, v) ==
   /\ Send([type |-> "2a", bal |-> b, val |-> v])
   /\ Assert(P2C(b, v), "P2C Fails!")
   /\ UNCHANGED <<maxBal, maxVBal, maxVal>>
+  
 (*
 The Phase2b(a) action is performed by acceptor a upon receipt of a phase 2a message.
 Acceptor a can perform this action only if the message is for a ballot number 

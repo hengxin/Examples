@@ -5,15 +5,16 @@ Consensus
   
 Voting
   A specification of a very abstract consensus algorithm
-  with a high level (unchecked) TLA+ proof that it implements
-  the Consensus spec.  I believe that this proof has been
-  expanded and checked with the TLAPS proof system by
-  Jean-Baptiste Tristan.
+  with a high level (unchecked) TLA+ proof that it implements the Consensus spec. 
+
+  I believe that this proof has been expanded 
+  and checked with the TLAPS proof system by Jean-Baptiste Tristan.
   
 Paxos
   A specification of a high-level version of the Paxos
   algorithm, a distributed message-passing algorithm that
   implements the Voting spec--and hence implements consensus.
+
   It contains a "first attempt" at an inductive invariant
   for the proof of implementation.  Tristan, who wrote most
   of a formal TLA+ proof of implementation, found that,
