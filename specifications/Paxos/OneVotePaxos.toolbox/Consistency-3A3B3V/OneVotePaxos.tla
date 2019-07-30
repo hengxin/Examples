@@ -1,9 +1,28 @@
--------------------------------- MODULE Paxos -------------------------------
+-------------------------------- MODULE OneVotePaxos ------------------------
 (* 
 This is a specification of the Paxos algorithm without explicit leaders or learners.
-It refines the spec in Voting.
+
+In this version:
+
+1. Phase2a(b, v): Delete the enabling condition 
+"~ \E m \in msgs : m.type = "2a" /\ m.bal = b".
+Then, OneValuePerBallot (and hence, OneVote) does not hold anymore.
+Consistency is also broken.
+
+2. Phase2b(a): To fix (1), we change "m.bal >= maxBal[a]"
+to "m.bal > maxBal[a] \/ (m.bal = maxBal[a] /\ maxVal[a] = None)" 
+to restore OneVote and also Consistency.
+
+Additionally,
+
+Phase1b(a): it is safe to send "1b" messages unconditionally by
+merging "/\ m.bal > maxBal(a)" and "/\ maxBal' = [maxBal EXCEPT ![a] = m.bal]"
+into "/\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]".
+However, this hurts performance significantly (therefore, we do not do this).
 *)
 EXTENDS Integers, TLC
+-----------------------------------------------------------------------------
+Max(m, n) == IF m < n THEN n ELSE m
 -----------------------------------------------------------------------------
 CONSTANT Value, Acceptor, Quorum
 
@@ -76,7 +95,8 @@ Phase1b(a) ==
         /\ m.type = "1a"
         /\ m.bal > maxBal[a]
         /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]   \* make promise
-        /\ Send([type |-> "1b", acc |-> a, bal |-> m.bal, 
+        \* /\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]
+        /\ Send([type |-> "1b", acc |-> a, bal |-> m.bal,
                  mbal |-> maxVBal[a], mval |-> maxVal[a]])
     /\ UNCHANGED <<maxVBal, maxVal>>
 
@@ -110,7 +130,7 @@ P2C(b, v) ==
                   /\ \A mm \in Q2bv : m.bal \geq mm.bal 
 
 Phase2a(b, v) ==
-  /\ ~ \E m \in msgs : m.type = "2a" /\ m.bal = b
+  \* /\ ~ \E m \in msgs : m.type = "2a" /\ m.bal = b \* allow different values for the same b
   /\ \E Q \in Quorum :
         LET Q1b == {m \in msgs : m.type = "1b" /\ m.acc \in Q /\ m.bal = b}
            Q1bv == {m \in Q1b : m.mbal \geq 0}
@@ -122,7 +142,6 @@ Phase2a(b, v) ==
   /\ Send([type |-> "2a", bal |-> b, val |-> v])
   /\ Assert(P2C(b, v), "P2C Fails!")
   /\ UNCHANGED <<maxBal, maxVBal, maxVal>>
-  
 (*
 The Phase2b(a) action is performed by acceptor a upon receipt of a phase 2a message.
 Acceptor a can perform this action only if the message is for a ballot number 
@@ -137,15 +156,16 @@ Otherwise,
 (3) P2C assertion for Phase2a does not hold ???
 *)
 Phase2b(a) == 
-    /\ \E m \in msgs : 
-        /\ m.type = "2a"
-        /\ m.bal \geq maxBal[a]
-        /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
-        /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
-        /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
-        /\ maxVal' = [maxVal EXCEPT ![a] = m.val]
-        /\ Send([type |-> "2b", acc |-> a, bal |-> m.bal, val |-> m.val]) 
-    /\ UNCHANGED <<>>
+    \E m \in msgs : 
+      /\ m.type = "2a"
+      \* /\ m.bal \geq maxBal[a]
+      /\ \/ m.bal > maxBal[a]
+         \/ m.bal = maxBal[a] /\ maxVal[a] = None \* write-once
+      /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
+      /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
+      /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
+      /\ maxVal' = [maxVal EXCEPT ![a] = m.val]
+      /\ Send([type |-> "2b", acc |-> a, bal |-> m.bal, val |-> m.val]) 
 (* 
 In an implementation, there will be learner processes that learn from the 
 phase 2b messages if a value has been chosen. The learners are omitted from 
@@ -180,6 +200,9 @@ and substituting the variable maxBal and the defined state function `votes'
 for the correspondingly-named variables of module Voting.
 *)
 V == INSTANCE Voting
+
+Consistency == V!C!Inv  \* Only about "chosen": TypeOK /\ Cardinality(chosen) <= 1
+StrongConsistency == V!Inv \* TypeOK /\ VotesSafe /\ OneValuePerBallot
 
 THEOREM Spec => V!Spec
 -----------------------------------------------------------------------------

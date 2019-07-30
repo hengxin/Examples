@@ -21,6 +21,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Consensus.tla</locationURI>
 		</link>
 		<link>
+			<name>FiniteSets.tla</name>
+			<type>1</type>
+			<location>/usr/local/lib/tlaps/FiniteSets.tla</location>
+		</link>
+		<link>
 			<name>Voting.tla</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Voting.tla</locationURI>

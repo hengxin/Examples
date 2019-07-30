@@ -1,23 +1,29 @@
--------------------------------- MODULE Paxos -------------------------------
+-------------------------------- MODULE OneVotePaxos ------------------------
 (* 
 This is a specification of the Paxos algorithm without explicit leaders or learners.
-It refines the spec in Voting.
 
 In this version:
 
-- Phase1a(b) messages can be duplicated (realized as adding it to a set in TLA+).
+1. Phase2a(b, v): Delete the enabling condition 
+"~ \E m \in msgs : m.type = "2a" /\ m.bal = b".
+Then, OneValuePerBallot (and hence, OneVote) does not hold anymore.
+Consistency is also broken.
+See the error trace file: OneVotePaxos-phase2a-error-trace.md
 
-- Phase1b(a): Due to the enabling condition "/\ m.bal > maxBal(a)",
-the "1b" messages are sent conditionally.
+2. Phase2b(a): To fix (1), we change "m.bal >= maxBal[a]"
+to "m.bal > maxBal[a] \/ (m.bal = maxBal[a] /\ maxVal[a] = None)" 
+to restore OneVote and also Consistency.
 
-- Phase2a(b, v) is enabled only if the proposer of b has not issued "2a" messages before.
-That is, ballots are "client-restricted" in terms of GS2Paxos@arXiv2019.
-Thus, OneValuePerBallot (and hence, OneVote) holds.
+Additionally,
 
-- Phase2b(a): Due to the enabling condition "/\ m.bal >= maxBal[a]", 
-the acceptors can accept a ballot only if it has not promised not to do that.
+Phase1b(a): it is safe to send "1b" messages unconditionally by
+merging "/\ m.bal > maxBal(a)" and "/\ maxBal' = [maxBal EXCEPT ![a] = m.bal]"
+into "/\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]".
+However, this hurts performance significantly (therefore, we do not do this).
 *)
 EXTENDS Integers, TLC
+-----------------------------------------------------------------------------
+Max(m, n) == IF m < n THEN n ELSE m
 -----------------------------------------------------------------------------
 CONSTANT Value, Acceptor, Quorum
 
@@ -90,7 +96,8 @@ Phase1b(a) ==
         /\ m.type = "1a"
         /\ m.bal > maxBal[a]
         /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]   \* make promise
-        /\ Send([type |-> "1b", acc |-> a, bal |-> m.bal, 
+        \* /\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]
+        /\ Send([type |-> "1b", acc |-> a, bal |-> m.bal,
                  mbal |-> maxVBal[a], mval |-> maxVal[a]])
     /\ UNCHANGED <<maxVBal, maxVal>>
 
@@ -124,7 +131,7 @@ P2C(b, v) ==
                   /\ \A mm \in Q2bv : m.bal \geq mm.bal 
 
 Phase2a(b, v) ==
-  /\ ~ \E m \in msgs : m.type = "2a" /\ m.bal = b
+  \* /\ ~ \E m \in msgs : m.type = "2a" /\ m.bal = b \* allow different values for the same b
   /\ \E Q \in Quorum :
         LET Q1b == {m \in msgs : m.type = "1b" /\ m.acc \in Q /\ m.bal = b}
            Q1bv == {m \in Q1b : m.mbal \geq 0}
@@ -152,7 +159,9 @@ Otherwise,
 Phase2b(a) == 
     \E m \in msgs : 
       /\ m.type = "2a"
-      /\ m.bal \geq maxBal[a]
+      \* /\ m.bal \geq maxBal[a]
+      /\ \/ m.bal > maxBal[a]
+         \/ m.bal = maxBal[a] /\ maxVal[a] = None \* write-once
       /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
       /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
       /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")

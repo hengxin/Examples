@@ -150,14 +150,15 @@ Otherwise,
 (3) P2C assertion for Phase2a does not hold ???
 *)
 Phase2b(a) == 
-    \E m \in msgs : 
-      /\ m.type = "2a"
-      /\ m.bal \geq maxBal[a]
-      /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
-      /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
-      /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
-      /\ maxVal' = [maxVal EXCEPT ![a] = m.val]
-      /\ Send([type |-> "2b", acc |-> a, bal |-> m.bal, val |-> m.val]) 
+    /\ \E m \in msgs : 
+        /\ m.type = "2a"
+        /\ m.bal \geq maxBal[a]
+        /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
+        /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
+        /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
+        /\ maxVal' = [maxVal EXCEPT ![a] = m.val]
+        /\ Send([type |-> "2b", acc |-> a, bal |-> m.bal, val |-> m.val]) 
+    /\ UNCHANGED <<>>
 (* 
 In an implementation, there will be learner processes that learn from the 
 phase 2b messages if a value has been chosen. The learners are omitted from 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Paxos</name>
+	<name>OneVotePaxos</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -18,7 +18,7 @@
 		<link>
 			<name>Consensus.tla</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Consensus.tla</locationURI>
+			<location>/home/hengxin/git-projects/tlaplus-examples/specifications/Paxos/Consensus.tla</location>
 		</link>
 		<link>
 			<name>FiniteSets.tla</name>
@@ -26,14 +26,14 @@
 			<location>/usr/local/lib/tlaps/FiniteSets.tla</location>
 		</link>
 		<link>
-			<name>Paxos.tla</name>
+			<name>OneVotePaxos.tla</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Paxos.tla</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/OneVotePaxos.tla</locationURI>
 		</link>
 		<link>
 			<name>Voting.tla</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Voting.tla</locationURI>
+			<location>/home/hengxin/git-projects/tlaplus-examples/specifications/Paxos/Voting.tla</location>
 		</link>
 	</linkedResources>
 </projectDescription>
