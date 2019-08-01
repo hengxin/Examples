@@ -18,7 +18,7 @@
 		<link>
 			<name>Consensus.tla</name>
 			<type>1</type>
-			<location>/home/hengxin/git-projects/tlaplus-examples/specifications/Paxos/Consensus.tla</location>
+			<locationURI>PARENT-1-PROJECT_LOC/Consensus.tla</locationURI>
 		</link>
 		<link>
 			<name>FiniteSets.tla</name>
@@ -33,7 +33,7 @@
 		<link>
 			<name>Voting.tla</name>
 			<type>1</type>
-			<location>/home/hengxin/git-projects/tlaplus-examples/specifications/Paxos/Voting.tla</location>
+			<locationURI>PARENT-1-PROJECT_LOC/Voting.tla</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

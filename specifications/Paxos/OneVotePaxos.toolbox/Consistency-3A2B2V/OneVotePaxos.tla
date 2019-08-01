@@ -21,7 +21,7 @@ merging "/\ m.bal > maxBal(a)" and "/\ maxBal' = [maxBal EXCEPT ![a] = m.bal]"
 into "/\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]".
 However, this hurts performance significantly (therefore, we do not do this).
 *)
-EXTENDS Integers, TLC
+EXTENDS Integers, FiniteSets, TLC
 -----------------------------------------------------------------------------
 Max(m, n) == IF m < n THEN n ELSE m
 -----------------------------------------------------------------------------
@@ -72,6 +72,17 @@ TypeOK ==
     /\ maxVal \in [Acceptor -> Value \cup {None}]
     /\ msgs \subseteq Message
 -----------------------------------------------------------------------------
+votes == [a \in Acceptor |->  
+           {<<m.bal, m.val>> : m \in {mm \in msgs: /\ mm.type = "2b"
+                                                   /\ mm.acc = a }}]
+VotedFor(a, b, v) == <<b, v>> \in votes[a] \* Acceptor a has voted for v in ballot b.
+
+ChosenAt(b, v) == \* <<b, v>> is chosen if a quorum of acceptors have voted for it.
+    \E Q \in Quorum:
+        \A a \in Q: VotedFor(a, b, v)
+
+chosen == {v \in Value: \E b \in Ballot: ChosenAt(b, v)}  
+-----------------------------------------------------------------------------
 Init == 
     /\ maxBal = [a \in Acceptor |-> -1]
     /\ maxVBal = [a \in Acceptor |-> -1]
@@ -94,9 +105,9 @@ message to the leader containing the values of maxVBal[a] and maxVal[a].
 Phase1b(a) == 
     /\ \E m \in msgs : 
         /\ m.type = "1a"
-        /\ m.bal > maxBal[a]
-        /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]   \* make promise
-        \* /\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]
+        \* /\ m.bal > maxBal[a]
+        \* /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]   \* make promise
+        /\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]
         /\ Send([type |-> "1b", acc |-> a, bal |-> m.bal,
                  mbal |-> maxVBal[a], mval |-> maxVal[a]])
     /\ UNCHANGED <<maxVBal, maxVal>>
@@ -161,7 +172,7 @@ Phase2b(a) ==
       /\ m.type = "2a"
       \* /\ m.bal \geq maxBal[a]
       /\ \/ m.bal > maxBal[a]
-         \/ m.bal = maxBal[a] /\ maxVal[a] = None \* write-once
+         \/ m.bal = maxBal[a] /\ (m.bal = maxVBal[a] => maxVal[a] = None) \* write-once
       /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
       /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
       /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
@@ -181,19 +192,6 @@ Next ==
 
 Spec == Init /\ [][Next]_vars
 ----------------------------------------------------------------------------
-(***************************************************************************)
-(* We now define the refinement mapping under which this algorithm         *)
-(* implements the specification in module Voting.                          *)
-(***************************************************************************)
-
-(***************************************************************************)
-(* As we observed, votes are registered by sending phase 2b messages.  So  *)
-(* the array `votes' describing the votes cast by the acceptors is defined *)
-(* as follows.                                                             *)
-(***************************************************************************)
-votes == [a \in Acceptor |->  
-           {<<m.bal, m.val>> : m \in {mm \in msgs: /\ mm.type = "2b"
-                                                   /\ mm.acc = a }}]
 (* 
 We now instantiate module Voting, substituting the constants Value, Acceptor, 
 and Quorum declared in this module for the corresponding constants of that module Voting, 

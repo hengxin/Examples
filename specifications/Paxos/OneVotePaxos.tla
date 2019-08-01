@@ -1,6 +1,10 @@
 -------------------------------- MODULE OneVotePaxos ------------------------
 (* 
 This is a specification of the Paxos algorithm without explicit leaders or learners.
+It is adapted from Paxos.tla.
+
+WARNING: It does not satisfy Consistency; 
+see OneVotePaxos-NotOneValuePerBallot-ErrorTrace.md
 
 In this version:
 
@@ -11,8 +15,8 @@ Consistency is also broken.
 See the error trace file: OneVotePaxos-phase2a-error-trace.md
 
 2. Phase2b(a): To fix (1), we change "m.bal >= maxBal[a]"
-to "m.bal > maxBal[a] \/ (m.bal = maxBal[a] /\ maxVal[a] = None)" 
-to restore OneVote and also Consistency.
+to "m.bal > maxBal[a] \/ (m.bal = maxBal[a] /\ (m.bal = maxVBal[a] => maxVal[a] = None))" 
+to restore OneVote.
 
 Additionally,
 
@@ -21,7 +25,7 @@ merging "/\ m.bal > maxBal(a)" and "/\ maxBal' = [maxBal EXCEPT ![a] = m.bal]"
 into "/\ maxBal' = [maxBal EXCEPT ![a] = Max(m.bal, @)]".
 However, this hurts performance significantly (therefore, we do not do this).
 *)
-EXTENDS Integers, TLC
+EXTENDS Integers, FiniteSets, TLC
 -----------------------------------------------------------------------------
 Max(m, n) == IF m < n THEN n ELSE m
 -----------------------------------------------------------------------------
@@ -49,23 +53,7 @@ VARIABLE maxBal,  \* maxBal[a]: the largest ballot number a has seen
 Send(m) == msgs' = msgs \cup {m}
 
 vars == <<maxBal, maxVBal, maxVal, msgs>>
-(***************************************************************************)
-(* NOTE:                                                                   *)
-(* The algorithm is easier to understand in terms of the set msgs of all   *)
-(* messages that have ever been sent.  A more accurate model would use     *)
-(* one or more variables to represent the messages actually in transit,    *)
-(* and it would include actions representing message loss and duplication  *)
-(* as well as message receipt.                                             *)
-(*                                                                         *)
-(* In the current spec, there is no need to model message loss because we  *)
-(* are mainly concerned with the algorithm's safety property.  The safety  *)
-(* part of the spec says only what messages may be received and does not   *)
-(* assert that any message actually is received.  Thus, there is no        *)
-(* difference between a lost message and one that is never received.  The  *)
-(* liveness property of the spec that we check makes it clear what         *)
-(* messages must be received (and hence either not lost or successfully    *)
-(* retransmitted if lost) to guarantee progress.                           *)
-(***************************************************************************)
+
 TypeOK == 
     /\ maxBal \in [Acceptor -> Ballot \cup {-1}]
     /\ maxVBal \in [Acceptor -> Ballot \cup {-1}]
@@ -77,7 +65,6 @@ Init ==
     /\ maxVBal = [a \in Acceptor |-> -1]
     /\ maxVal = [a \in Acceptor |-> None]
     /\ msgs = {}
------------------------------------------------------------------------------
 (* 
 In an implementation, there will be a leader process that orchestrates  
 a ballot. The ballot b leader performs actions Phase1a(b) and Phase2a(b).
@@ -154,14 +141,14 @@ Note: It also sets maxBal[a] to the message's ballot number.
 Otherwise, 
 (1) NoBackInTime for Phase1b does not hold.
 (2) "Non-Increasing Error" assertion in Phase2b(a) fails.
-(3) P2C assertion for Phase2a does not hold ???
+(3) P2C assertion for Phase2a does not hold. 
 *)
 Phase2b(a) == 
     \E m \in msgs : 
       /\ m.type = "2a"
       \* /\ m.bal \geq maxBal[a]
       /\ \/ m.bal > maxBal[a]
-         \/ m.bal = maxBal[a] /\ maxVal[a] = None \* write-once
+         \/ m.bal = maxBal[a] /\ (m.bal = maxVBal[a] => maxVal[a] = None) \* write-once
       /\ maxBal' = [maxBal EXCEPT ![a] = m.bal]
       /\ maxVBal' = [maxVBal EXCEPT ![a] = m.bal] 
       /\ Assert(maxVBal'[a] >= maxVBal[a], "Non-Increasing Error!")
@@ -181,36 +168,25 @@ Next ==
 
 Spec == Init /\ [][Next]_vars
 ----------------------------------------------------------------------------
-(***************************************************************************)
-(* We now define the refinement mapping under which this algorithm         *)
-(* implements the specification in module Voting.                          *)
-(***************************************************************************)
-
-(***************************************************************************)
-(* As we observed, votes are registered by sending phase 2b messages.  So  *)
-(* the array `votes' describing the votes cast by the acceptors is defined *)
-(* as follows.                                                             *)
-(***************************************************************************)
-votes == [a \in Acceptor |->  
-           {<<m.bal, m.val>> : m \in {mm \in msgs: /\ mm.type = "2b"
-                                                   /\ mm.acc = a }}]
 (* 
 We now instantiate module Voting, substituting the constants Value, Acceptor, 
 and Quorum declared in this module for the corresponding constants of that module Voting, 
 and substituting the variable maxBal and the defined state function `votes' 
 for the correspondingly-named variables of module Voting.
 *)
+votes == [a \in Acceptor |->  
+           {<<m.bal, m.val>> : m \in {mm \in msgs: /\ mm.type = "2b"
+                                                   /\ mm.acc = a }}]
 V == INSTANCE Voting
 
 Consistency == V!C!Inv  \* Only about "chosen": TypeOK /\ Cardinality(chosen) <= 1
 StrongConsistency == V!Inv \* TypeOK /\ VotesSafe /\ OneValuePerBallot
-
-THEOREM Spec => V!Spec
 -----------------------------------------------------------------------------
-(***************************************************************************)
-(* Here is a first attempt at an inductive invariant used to prove this    *)
-(* theorem.                                                                *)
-(***************************************************************************)
+(* 
+A first attempt at an inductive invariant used to prove this theorem.
+*)
+THEOREM Spec => V!Spec
+
 Inv == /\ TypeOK
        /\ \A a \in Acceptor : IF maxVBal[a] = -1
                                 THEN maxVal[a] = None
